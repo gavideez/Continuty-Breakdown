@@ -1,5 +1,6 @@
 // Application State
 let scenes = JSON.parse(localStorage.getItem('continuity_scenes') || '[]');
+let stagedQueue = []; // Temporary queue before permanent save
 
 // DOM Elements
 const elements = {
@@ -15,6 +16,9 @@ const elements = {
     costumeInput: document.getElementById('costume'),
     propsInput: document.getElementById('props'),
     descriptionInput: document.getElementById('description'),
+    stagedTableBody: document.getElementById('staged-table-body'),
+    queueCountSpan: document.getElementById('queue-count'),
+    saveAllScenesBtn: document.getElementById('save-all-scenes-btn'),
     masterTableBody: document.getElementById('master-table-body'),
     charBreakdownContainer: document.getElementById('character-breakdown-container'),
     downloadMasterBtn: document.getElementById('download-master-btn'),
@@ -58,12 +62,12 @@ function compareSceneNumbers(a, b) {
     return alphaA.localeCompare(alphaB);
 }
 
-// Form Submission
+// 1. Handle adding scene to temporary staging queue
 elements.sceneForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
-    const newScene = {
-        id: 'scene_' + Date.now(),
+    const stagedScene = {
+        id: 'staged_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5),
         sceneNo: elements.sceneNoInput.value.trim(),
         characters: elements.characterInput.value.split(',').map(c => c.trim()).filter(Boolean),
         costume: elements.costumeInput.value.trim(),
@@ -71,16 +75,67 @@ elements.sceneForm.addEventListener('submit', (e) => {
         description: elements.descriptionInput.value.trim()
     };
 
-    scenes.push(newScene);
-    scenes.sort((a, b) => compareSceneNumbers(a.sceneNo, b.sceneNo));
-    localStorage.setItem('continuity_scenes', JSON.stringify(scenes));
+    stagedQueue.push(stagedScene);
+    renderStagedQueue();
 
-    alert('Scene added successfully!');
+    // Reset inputs and refocus for rapid entry
     elements.sceneForm.reset();
     elements.sceneNoInput.focus();
 });
 
-// Delete Scene Action
+// Remove item from staging queue
+window.removeStagedScene = function(id) {
+    stagedQueue = stagedQueue.filter(s => s.id !== id);
+    renderStagedQueue();
+};
+
+function renderStagedQueue() {
+    elements.stagedTableBody.innerHTML = '';
+    elements.queueCountSpan.textContent = stagedQueue.length;
+    
+    if (stagedQueue.length === 0) {
+        elements.stagedTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes in queue yet. Fill out the form above.</td></tr>`;
+        elements.saveAllScenesBtn.disabled = true;
+        return;
+    }
+
+    elements.saveAllScenesBtn.disabled = false;
+
+    stagedQueue.forEach(scene => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${scene.sceneNo}</strong></td>
+            <td>${scene.characters.join(', ')}</td>
+            <td>${scene.costume || '-'}</td>
+            <td>${scene.props || '-'}</td>
+            <td>${scene.description || '-'}</td>
+            <td><button class="btn btn-danger" onclick="window.removeStagedScene('${scene.id}')"><i class="ph ph-trash"></i></button></td>
+        `;
+        elements.stagedTableBody.appendChild(tr);
+    });
+}
+
+// 2. Commit all staged scenes to persistent database storage
+elements.saveAllScenesBtn.addEventListener('click', () => {
+    if (stagedQueue.length === 0) return;
+
+    const finalizedScenes = stagedQueue.map(({ id, ...rest }) => ({
+        id: 'scene_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+        ...rest
+    }));
+
+    scenes.push(...finalizedScenes);
+    scenes.sort((a, b) => compareSceneNumbers(a.sceneNo, b.sceneNo));
+    localStorage.setItem('continuity_scenes', JSON.stringify(scenes));
+
+    stagedQueue = [];
+    renderStagedQueue();
+
+    alert('All staged scenes successfully saved!');
+    switchTab('master');
+});
+
+// Delete Scene from Master Record
 window.deleteScene = function(id) {
     if (confirm('Are you sure you want to delete this scene?')) {
         scenes = scenes.filter(s => s.id !== id);
@@ -94,7 +149,7 @@ window.deleteScene = function(id) {
 function renderMasterTable() {
     elements.masterTableBody.innerHTML = '';
     if (scenes.length === 0) {
-        elements.masterTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes added yet.</td></tr>`;
+        elements.masterTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes saved in database yet.</td></tr>`;
         return;
     }
 
@@ -137,7 +192,7 @@ function renderCharacterBreakdown() {
         wrapper.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                 <h3 class="char-section-title"><i class="ph ph-user"></i> ${characterName}</h3>
-                <button class="btn btn-primary" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;" onclick="downloadSingleCharacterPDF('${characterName}')">Download Sheet</button>
+                <button class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;" onclick="downloadSingleCharacterPDF('${characterName}')">Download Sheet</button>
             </div>
             <div class="table-responsive">
                 <table id="char-table-${characterName.replace(/\s+/g, '_')}">
@@ -180,7 +235,7 @@ elements.downloadMasterBtn.addEventListener('click', async (e) => {
     btn.disabled = true;
 
     try {
-        const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#1e293b", useCORS: true });
+        const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#07090e", useCORS: true });
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
         const pdf = new jspdf.jsPDF({ orientation: imgWidth > imgHeight ? 'l' : 'p', unit: 'px', format: [imgWidth, imgHeight] });
@@ -200,7 +255,7 @@ window.downloadSingleCharacterPDF = async function(characterName) {
     const tableElement = document.getElementById(tableId).closest('.character-sheet-block') || document.getElementById(tableId);
 
     try {
-        const canvas = await html2canvas(tableElement, { scale: 2, backgroundColor: "#1e293b", useCORS: true });
+        const canvas = await html2canvas(tableElement, { scale: 2, backgroundColor: "#07090e", useCORS: true });
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
         const pdf = new jspdf.jsPDF({ orientation: imgWidth > imgHeight ? 'l' : 'p', unit: 'px', format: [imgWidth, imgHeight] });
@@ -231,7 +286,7 @@ elements.downloadAllCharsBtn.addEventListener('click', async (e) => {
         const blocks = container.querySelectorAll('.character-sheet-block');
 
         for (let i = 0; i < blocks.length; i++) {
-            const canvas = await html2canvas(blocks[i], { scale: 2, backgroundColor: "#1e293b", useCORS: true });
+            const canvas = await html2canvas(blocks[i], { scale: 2, backgroundColor: "#07090e", useCORS: true });
             const imgData = canvas.toDataURL('image/png');
             const imgProps = pdf.getImageProperties(imgData);
             const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
