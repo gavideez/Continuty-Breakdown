@@ -1,6 +1,6 @@
 // Application State
 let scenes = JSON.parse(localStorage.getItem('continuity_scenes') || '[]');
-let stagedQueue = [];
+let stagedQueue = []; // Temporary queue before permanent save
 
 // DOM Elements
 const elements = {
@@ -25,7 +25,7 @@ const elements = {
     downloadAllCharsBtn: document.getElementById('download-all-chars-btn')
 };
 
-// Tab Switching
+// Tab Switching Logic
 elements.tabAdd.addEventListener('click', () => switchTab('add'));
 elements.tabMaster.addEventListener('click', () => switchTab('master'));
 elements.tabCharacter.addEventListener('click', () => switchTab('character'));
@@ -62,7 +62,7 @@ function compareSceneNumbers(a, b) {
     return alphaA.localeCompare(alphaB);
 }
 
-// Handle adding scene to temporary staging queue
+// 1. Handle adding scene to temporary staging queue
 elements.sceneForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
@@ -78,10 +78,12 @@ elements.sceneForm.addEventListener('submit', (e) => {
     stagedQueue.push(stagedScene);
     renderStagedQueue();
 
+    // Reset inputs and refocus for rapid entry
     elements.sceneForm.reset();
     elements.sceneNoInput.focus();
 });
 
+// Remove item from staging queue
 window.removeStagedScene = function(id) {
     stagedQueue = stagedQueue.filter(s => s.id !== id);
     renderStagedQueue();
@@ -92,7 +94,7 @@ function renderStagedQueue() {
     elements.queueCountSpan.textContent = stagedQueue.length;
     
     if (stagedQueue.length === 0) {
-        elements.stagedTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes in queue yet.</td></tr>`;
+        elements.stagedTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes in queue yet. Fill out the form above.</td></tr>`;
         elements.saveAllScenesBtn.disabled = true;
         return;
     }
@@ -113,7 +115,7 @@ function renderStagedQueue() {
     });
 }
 
-// Commit staged scenes to DB
+// 2. Commit all staged scenes to persistent database storage
 elements.saveAllScenesBtn.addEventListener('click', () => {
     if (stagedQueue.length === 0) return;
 
@@ -133,6 +135,7 @@ elements.saveAllScenesBtn.addEventListener('click', () => {
     switchTab('master');
 });
 
+// Delete Scene from Master Record
 window.deleteScene = function(id) {
     if (confirm('Are you sure you want to delete this scene?')) {
         scenes = scenes.filter(s => s.id !== id);
@@ -164,7 +167,7 @@ function renderMasterTable() {
     });
 }
 
-// Render Character Breakdown with Sorted Continuity Numbers in One Column
+// Render Separate Tables Headed by Character Names
 function renderCharacterBreakdown() {
     elements.charBreakdownContainer.innerHTML = '';
     
@@ -173,7 +176,6 @@ function renderCharacterBreakdown() {
         return;
     }
 
-    // Extract unique character names
     const uniqueCharacters = new Set();
     scenes.forEach(scene => {
         scene.characters.forEach(char => uniqueCharacters.add(char));
@@ -182,17 +184,7 @@ function renderCharacterBreakdown() {
     const sortedCharacters = Array.from(uniqueCharacters).sort();
 
     sortedCharacters.forEach(characterName => {
-        // Find all scenes belonging to this character
         const charScenes = scenes.filter(s => s.characters.includes(characterName));
-        
-        // Extract and sort unique scene numbers cleanly
-        const sceneNumbers = charScenes.map(s => s.sceneNo);
-        sceneNumbers.sort(compareSceneNumbers);
-
-        // Aggregate unique costumes and props across their scenes
-        const costumes = [...new Set(charScenes.map(s => s.costume).filter(Boolean))].join(', ');
-        const props = [...new Set(charScenes.map(s => s.props).filter(Boolean))].join(', ');
-
         const wrapper = document.createElement('div');
         wrapper.className = 'character-sheet-block';
         wrapper.style.marginBottom = '2rem';
@@ -206,23 +198,21 @@ function renderCharacterBreakdown() {
                 <table id="char-table-${characterName.replace(/\s+/g, '_')}">
                     <thead>
                         <tr>
-                            <th>Character Name</th>
-                            <th>All Continuity Scene Numbers</th>
-                            <th>Costumes / Wardrobe</th>
+                            <th>Scene #</th>
+                            <th>Costume</th>
                             <th>Props</th>
+                            <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><strong>${characterName}</strong></td>
-                            <td>
-                                ${sceneNumbers.length > 0 
-                                    ? sceneNumbers.map(no => `<span class="scene-badge">${no}</span>`).join(' ') 
-                                    : '-'}
-                            </td>
-                            <td>${costumes || '-'}</td>
-                            <td>${props || '-'}</td>
-                        </tr>
+                        ${charScenes.map(scene => `
+                            <tr>
+                                <td><strong>${scene.sceneNo}</strong></td>
+                                <td>${scene.costume || '-'}</td>
+                                <td>${scene.props || '-'}</td>
+                                <td>${scene.description || '-'}</td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
