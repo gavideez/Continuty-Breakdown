@@ -3,34 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Character Continuity Breakdown | Glass Edition</title>
+    <title>Character Continuity Breakdown</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts & Phosphor Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI elements -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
-    <div class="glass-orb orb-1"></div>
-    <div class="glass-orb orb-2"></div>
-
     <div class="app-container">
-        <!-- Navigation Header -->
+        <!-- Navigation Tabs -->
         <header class="main-header">
-            <div class="brand">
-                <i class="ph ph-film-strip logo-icon"></i>
-                <h1>Continuity<span class="highlight">OS</span></h1>
-            </div>
+            <h1>Script Continuity Manager</h1>
             <nav class="nav-tabs">
-                <button id="tab-add" class="tab-btn active"><i class="ph ph-plus-circle"></i> Add Scenes</button>
-                <button id="tab-master" class="tab-btn"><i class="ph ph-table"></i> Master Schedule</button>
-                <button id="tab-character" class="tab-btn"><i class="ph ph-users-three"></i> Character Sheets</button>
+                <button id="tab-add" class="tab-btn active">Add Scenes</button>
+                <button id="tab-master" class="tab-btn">Master Schedule</button>
+                <button id="tab-character" class="tab-btn">Character Breakdown</button>
             </nav>
         </header>
 
-        <!-- VIEW 1: STAGING & ADDING SCENES -->
+        <!-- VIEW 1: ADD MULTIPLE SCENES FORM & QUEUE -->
         <section id="view-add" class="view-section">
-            <div class="glass-card">
-                <h2><i class="ph ph-note-pencil"></i> Stage New Scenes</h2>
+            <div class="card">
+                <h2>Stage New Scenes</h2>
                 <form id="scene-form">
                     <div class="form-grid">
                         <div class="form-group">
@@ -43,26 +36,27 @@
                         </div>
                         <div class="form-group">
                             <label for="costume">Costume / Wardrobe</label>
-                            <input type="text" id="costume" placeholder="e.g. Black leather jacket">
+                            <input type="text" id="costume" placeholder="e.g. Black leather jacket, jeans">
                         </div>
                         <div class="form-group">
                             <label for="props">Props</label>
                             <input type="text" id="props" placeholder="e.g. Silver watch, Revolver">
                         </div>
                     </div>
-                    <div class="form-group" style="margin-top: 1.2rem;">
+                    <div class="form-group" style="margin-top: 1rem;">
                         <label for="description">Scene Description / Action</label>
-                        <textarea id="description" rows="3" placeholder="Brief cinematic description of the action..."></textarea>
+                        <textarea id="description" rows="3" placeholder="Brief description of the action..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-secondary" style="margin-top: 1.2rem;"><i class="ph ph-plus"></i> Add to Staging Queue</button>
+                    <!-- Button to add to current queue instead of saving permanently yet -->
+                    <button type="submit" class="btn btn-secondary" style="margin-top: 1rem;"><i class="ph ph-plus"></i> Add to Queue</button>
                 </form>
             </div>
 
             <!-- Staged Queue Preview Card -->
-            <div class="glass-card">
-                <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem;">
-                    <h3>Staged Queue Preview (<span id="queue-count">0</span>)</h3>
-                    <button id="save-all-scenes-btn" class="btn btn-primary" disabled><i class="ph ph-floppy-disk"></i> Save All to Database</button>
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3>Staged Scenes Queue (<span id="queue-count">0</span>)</h3>
+                    <button id="save-all-scenes-btn" class="btn btn-primary" disabled><i class="ph ph-floppy-disk"></i> Save All Scenes to Database</button>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -77,7 +71,7 @@
                             </tr>
                         </thead>
                         <tbody id="staged-table-body">
-                            <tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes in queue yet. Fill out the form above.</td></tr>
+                            <tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes added to queue yet. Fill out the form above.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -86,10 +80,10 @@
 
         <!-- VIEW 2: MASTER TABLE -->
         <section id="view-master" class="view-section hidden">
-            <div class="glass-card" id="master-print-area">
-                <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem;">
+            <div class="card" id="master-print-area">
+                <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                     <h2>Master Script Breakdown</h2>
-                    <button id="download-master-btn" class="btn btn-primary"><i class="ph ph-download-simple"></i> Download Master PDF</button>
+                    <button id="download-master-btn" class="btn btn-primary"><i class="ph ph-download"></i> Download Master PDF</button>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -111,20 +105,20 @@
 
         <!-- VIEW 3: CHARACTER BREAKDOWN -->
         <section id="view-character" class="view-section hidden">
-            <div class="glass-card">
-                <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div class="card">
+                <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h2>Breakdown by Character</h2>
-                        <p class="subtitle" style="margin-bottom:0; color: var(--text-muted);">Scenes grouped automatically by individual character continuity tracks.</p>
+                        <p class="subtitle" style="margin-bottom:0;">Scenes grouped automatically by individual character continuity lines.</p>
                     </div>
-                    <button id="download-all-chars-btn" class="btn btn-primary"><i class="ph ph-download-simple"></i> Download All Character PDFs</button>
+                    <button id="download-all-chars-btn" class="btn btn-primary"><i class="ph ph-download"></i> Download All Characters PDF</button>
                 </div>
                 <div id="character-breakdown-container"></div>
             </div>
         </section>
     </div>
 
-    <!-- PDF Libraries -->
+    <!-- PDF Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="app.js"></script>
