@@ -33,8 +33,20 @@ body {
     opacity: 0.35;
     pointer-events: none;
 }
-.orb-1 { width: 350px; height: 350px; background: #4f46e5; top: -50px; left: -50px; }
-.orb-2 { width: 450px; height: 450px; background: #06b6d4; bottom: -100px; right: -50px; }
+.orb-1 {
+    width: 350px;
+    height: 350px;
+    background: #4f46e5;
+    top: -50px;
+    left: -50px;
+}
+.orb-2 {
+    width: 450px;
+    height: 450px;
+    background: #06b6d4;
+    bottom: -100px;
+    right: -50px;
+}
 
 .app-container { max-width: 1240px; margin: 0 auto; position: relative; z-index: 1; }
 .hidden { display: none !important; }
@@ -149,8 +161,14 @@ input:focus, textarea:focus {
 }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-.btn-secondary { background: var(--secondary); color: var(--text-color); }
-.btn-secondary:hover { background: var(--secondary-hover); border-color: rgba(255, 255, 255, 0.2); }
+.btn-secondary {
+    background: var(--secondary);
+    color: var(--text-color);
+}
+.btn-secondary:hover {
+    background: var(--secondary-hover);
+    border-color: rgba(255, 255, 255, 0.2);
+}
 
 .btn-danger {
     background: rgba(244, 63, 94, 0.15);
@@ -185,17 +203,6 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
     padding: 0.4rem 0.9rem;
     border-radius: 8px;
     border: 1px solid rgba(99, 102, 241, 0.2);
-}
-
-.scene-badge {
-    background: rgba(99, 102, 241, 0.2);
-    border: 1px solid rgba(99, 102, 241, 0.4);
-    color: #c7d2fe;
-    padding: 0.2rem 0.6rem;
-    border-radius: 6px;
-    font-weight: 600;
-    display: inline-block;
-    margin: 2px;
 }
 
 @media print {
