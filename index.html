@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Continuity Breakdown</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Phosphor Icons for UI elements -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Tabs -->
+        <header class="main-header">
+            <h1>Script Continuity Manager</h1>
+            <nav class="nav-tabs">
+                <button id="tab-add" class="tab-btn active">Add Scene</button>
+                <button id="tab-master" class="tab-btn">Master Schedule</button>
+                <button id="tab-character" class="tab-btn">Character Breakdown</button>
+            </nav>
+        </header>
+
+        <!-- VIEW 1: ADD SCENE FORM -->
+        <section id="view-add" class="view-section">
+            <form id="scene-form" class="card">
+                <h2>Add New Scene</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="scene-no">Scene No.</label>
+                        <input type="text" id="scene-no" required placeholder="e.g. 1, 1A, 2">
+                    </div>
+                    <div class="form-group">
+                        <label for="character-name">Character Name(s)</label>
+                        <input type="text" id="character-name" required placeholder="Comma separated, e.g. Gavindu, Nethmi">
+                    </div>
+                    <div class="form-group">
+                        <label for="costume">Costume / Wardrobe</label>
+                        <input type="text" id="costume" placeholder="e.g. Black leather jacket, jeans">
+                    </div>
+                    <div class="form-group">
+                        <label for="props">Props</label>
+                        <input type="text" id="props" placeholder="e.g. Silver watch, Revolver">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="description">Scene Description / Action</label>
+                    <textarea id="description" rows="3" placeholder="Brief description of the action..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save Scene</button>
+            </form>
+        </section>
+
+        <!-- VIEW 2: MASTER TABLE -->
+        <section id="view-master" class="view-section hidden">
+            <div class="card" id="master-print-area">
+                <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2>Master Script Breakdown</h2>
+                    <button id="download-master-btn" class="btn btn-primary"><i class="ph ph-download"></i> Download Master PDF</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Scene #</th>
+                                <th>Characters</th>
+                                <th>Costume</th>
+                                <th>Props</th>
+                                <th>Description</th>
+                                <th class="no-print">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="master-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: CHARACTER BREAKDOWN -->
+        <section id="view-character" class="view-section hidden">
+            <div class="card">
+                <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2>Breakdown by Character</h2>
+                        <p class="subtitle" style="margin-bottom:0;">Scenes grouped automatically by individual character continuity lines.</p>
+                    </div>
+                    <button id="download-all-chars-btn" class="btn btn-primary"><i class="ph ph-download"></i> Download All Characters PDF</button>
+                </div>
+                <div id="character-breakdown-container">
+                    <!-- Dynamic separate tables per character will be rendered here -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
