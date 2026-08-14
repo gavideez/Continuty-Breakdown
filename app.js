@@ -62,12 +62,12 @@ function compareSceneNumbers(a, b) {
     return alphaA.localeCompare(alphaB);
 }
 
-// 1. Handle adding scene to temporary staging queue
+// 1. Handle adding scene to temporary queue
 elements.sceneForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
     const stagedScene = {
-        id: 'staged_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5),
+        id: 'staged_' + Date.now() + '_' + Math.random().toString(36.substring(2, 5)),
         sceneNo: elements.sceneNoInput.value.trim(),
         characters: elements.characterInput.value.split(',').map(c => c.trim()).filter(Boolean),
         costume: elements.costumeInput.value.trim(),
@@ -78,7 +78,7 @@ elements.sceneForm.addEventListener('submit', (e) => {
     stagedQueue.push(stagedScene);
     renderStagedQueue();
 
-    // Reset inputs and refocus for rapid entry
+    // Reset input fields and refocus on scene number for rapid entry
     elements.sceneForm.reset();
     elements.sceneNoInput.focus();
 });
@@ -94,7 +94,7 @@ function renderStagedQueue() {
     elements.queueCountSpan.textContent = stagedQueue.length;
     
     if (stagedQueue.length === 0) {
-        elements.stagedTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes in queue yet. Fill out the form above.</td></tr>`;
+        elements.stagedTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes added to queue yet. Fill out the form above.</td></tr>`;
         elements.saveAllScenesBtn.disabled = true;
         return;
     }
@@ -119,6 +119,7 @@ function renderStagedQueue() {
 elements.saveAllScenesBtn.addEventListener('click', () => {
     if (stagedQueue.length === 0) return;
 
+    // Remove temporary ID properties and push to main scenes list
     const finalizedScenes = stagedQueue.map(({ id, ...rest }) => ({
         id: 'scene_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
         ...rest
@@ -128,10 +129,11 @@ elements.saveAllScenesBtn.addEventListener('click', () => {
     scenes.sort((a, b) => compareSceneNumbers(a.sceneNo, b.sceneNo));
     localStorage.setItem('continuity_scenes', JSON.stringify(scenes));
 
+    // Clear queue
     stagedQueue = [];
     renderStagedQueue();
 
-    alert('All staged scenes successfully saved!');
+    alert('All scenes successfully saved to database!');
     switchTab('master');
 });
 
@@ -149,7 +151,7 @@ window.deleteScene = function(id) {
 function renderMasterTable() {
     elements.masterTableBody.innerHTML = '';
     if (scenes.length === 0) {
-        elements.masterTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes saved in database yet.</td></tr>`;
+        elements.masterTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes saved yet.</td></tr>`;
         return;
     }
 
@@ -192,7 +194,7 @@ function renderCharacterBreakdown() {
         wrapper.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                 <h3 class="char-section-title"><i class="ph ph-user"></i> ${characterName}</h3>
-                <button class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;" onclick="downloadSingleCharacterPDF('${characterName}')">Download Sheet</button>
+                <button class="btn btn-primary" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;" onclick="downloadSingleCharacterPDF('${characterName}')">Download Sheet</button>
             </div>
             <div class="table-responsive">
                 <table id="char-table-${characterName.replace(/\s+/g, '_')}">
@@ -235,7 +237,7 @@ elements.downloadMasterBtn.addEventListener('click', async (e) => {
     btn.disabled = true;
 
     try {
-        const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#07090e", useCORS: true });
+        const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#1e293b", useCORS: true });
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
         const pdf = new jspdf.jsPDF({ orientation: imgWidth > imgHeight ? 'l' : 'p', unit: 'px', format: [imgWidth, imgHeight] });
@@ -255,7 +257,7 @@ window.downloadSingleCharacterPDF = async function(characterName) {
     const tableElement = document.getElementById(tableId).closest('.character-sheet-block') || document.getElementById(tableId);
 
     try {
-        const canvas = await html2canvas(tableElement, { scale: 2, backgroundColor: "#07090e", useCORS: true });
+        const canvas = await html2canvas(tableElement, { scale: 2, backgroundColor: "#1e293b", useCORS: true });
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
         const pdf = new jspdf.jsPDF({ orientation: imgWidth > imgHeight ? 'l' : 'p', unit: 'px', format: [imgWidth, imgHeight] });
@@ -286,7 +288,7 @@ elements.downloadAllCharsBtn.addEventListener('click', async (e) => {
         const blocks = container.querySelectorAll('.character-sheet-block');
 
         for (let i = 0; i < blocks.length; i++) {
-            const canvas = await html2canvas(blocks[i], { scale: 2, backgroundColor: "#07090e", useCORS: true });
+            const canvas = await html2canvas(blocks[i], { scale: 2, backgroundColor: "#1e293b", useCORS: true });
             const imgData = canvas.toDataURL('image/png');
             const imgProps = pdf.getImageProperties(imgData);
             const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
