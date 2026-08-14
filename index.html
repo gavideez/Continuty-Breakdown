@@ -14,68 +14,40 @@
         <header class="main-header">
             <h1>Script Continuity Manager</h1>
             <nav class="nav-tabs">
-                <button id="tab-add" class="tab-btn active">Add Scenes</button>
+                <button id="tab-add" class="tab-btn active">Add Scene</button>
                 <button id="tab-master" class="tab-btn">Master Schedule</button>
                 <button id="tab-character" class="tab-btn">Character Breakdown</button>
             </nav>
         </header>
 
-        <!-- VIEW 1: ADD MULTIPLE SCENES FORM & QUEUE -->
+        <!-- VIEW 1: ADD SCENE FORM -->
         <section id="view-add" class="view-section">
-            <div class="card">
-                <h2>Stage New Scenes</h2>
-                <form id="scene-form">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="scene-no">Scene No.</label>
-                            <input type="text" id="scene-no" required placeholder="e.g. 1, 1A, 2">
-                        </div>
-                        <div class="form-group">
-                            <label for="character-name">Character Name(s)</label>
-                            <input type="text" id="character-name" required placeholder="Comma separated, e.g. Gavindu, Nethmi">
-                        </div>
-                        <div class="form-group">
-                            <label for="costume">Costume / Wardrobe</label>
-                            <input type="text" id="costume" placeholder="e.g. Black leather jacket, jeans">
-                        </div>
-                        <div class="form-group">
-                            <label for="props">Props</label>
-                            <input type="text" id="props" placeholder="e.g. Silver watch, Revolver">
-                        </div>
+            <form id="scene-form" class="card">
+                <h2>Add New Scene</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="scene-no">Scene No.</label>
+                        <input type="text" id="scene-no" required placeholder="e.g. 1, 1A, 2">
                     </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label for="description">Scene Description / Action</label>
-                        <textarea id="description" rows="3" placeholder="Brief description of the action..."></textarea>
+                    <div class="form-group">
+                        <label for="character-name">Character Name(s)</label>
+                        <input type="text" id="character-name" required placeholder="Comma separated, e.g. Gavindu, Nethmi">
                     </div>
-                    <!-- Button to add to current queue instead of saving permanently yet -->
-                    <button type="submit" class="btn btn-secondary" style="margin-top: 1rem;"><i class="ph ph-plus"></i> Add to Queue</button>
-                </form>
-            </div>
-
-            <!-- Staged Queue Preview Card -->
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                    <h3>Staged Scenes Queue (<span id="queue-count">0</span>)</h3>
-                    <button id="save-all-scenes-btn" class="btn btn-primary" disabled><i class="ph ph-floppy-disk"></i> Save All Scenes to Database</button>
+                    <div class="form-group">
+                        <label for="costume">Costume / Wardrobe</label>
+                        <input type="text" id="costume" placeholder="e.g. Black leather jacket, jeans">
+                    </div>
+                    <div class="form-group">
+                        <label for="props">Props</label>
+                        <input type="text" id="props" placeholder="e.g. Silver watch, Revolver">
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Scene #</th>
-                                <th>Characters</th>
-                                <th>Costume</th>
-                                <th>Props</th>
-                                <th>Description</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="staged-table-body">
-                            <tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scenes added to queue yet. Fill out the form above.</td></tr>
-                        </tbody>
-                    </table>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="description">Scene Description / Action</label>
+                    <textarea id="description" rows="3" placeholder="Brief description of the action..."></textarea>
                 </div>
-            </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save Scene</button>
+            </form>
         </section>
 
         <!-- VIEW 2: MASTER TABLE -->
@@ -97,7 +69,9 @@
                                 <th class="no-print">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="master-table-body"></tbody>
+                        <tbody id="master-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -113,7 +87,9 @@
                     </div>
                     <button id="download-all-chars-btn" class="btn btn-primary"><i class="ph ph-download"></i> Download All Characters PDF</button>
                 </div>
-                <div id="character-breakdown-container"></div>
+                <div id="character-breakdown-container">
+                    <!-- Dynamic separate tables per character will be rendered here -->
+                </div>
             </div>
         </section>
     </div>
